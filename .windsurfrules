@@ -1,0 +1,66 @@
+---
+# .windsurfrules
+
+## !!important use react 18 because tailwind has not support in react 19
+
+## Project Overview
+- **Type:** Windsurf file - Task management PWA
+- **Description:** Single-user task management application built with modern technologies following Atomic Design principles, persisting data locally with Zustand and localStorage.
+- **Primary Goal:** Provide an installable PWA for one user to manage projects and tasks offline with visual in-app notifications and image handling.
+
+## Project Structure
+### Framework-Specific Routing
+- **Directory Rules:**
+  - React Router 6: use `src/routes/` with `createBrowserRouter` or `BrowserRouter` patterns
+  - Example 1: `src/pages/onboarding.tsx` → onboarding flow entry
+  - Example 2: `src/pages/dashboard.tsx` → dashboard UI
+  - Example 3: `src/pages/project/[id].tsx` → dynamic project pages
+
+### Core Directories
+- **Versioned Structure:**
+  - `src/atoms`: Atomic Design atoms (React 18 functional components)
+  - `src/molecules`: Atomic Design molecules
+  - `src/organisms`: Atomic Design organisms
+  - `src/templates`: Page-level layout templates
+  - `src/pages`: Route-level React components mapping to URLs
+  - `src/store`: Zustand stores with `persist` middleware for localStorage
+  - `src/services`: Utilities for `browser-image-compression` and storage adapters
+  - `src/i18n`: Translation files (pt-BR, en-US) with date/time format helpers
+  - `src/assets`: Static assets (icons, 3D illustrations)
+
+### Key Files
+- **Stack-Versioned Patterns:**
+  - `vite.config.ts`: Vite PWA plugin configuration, manifest and SW registration
+  - `src/main.tsx`: React 18 root with `createRoot`, Router and i18n providers
+  - `src/index.html`: HTML template linking manifest and registering service worker
+  - `tailwind.config.ts`: Tailwind CSS custom theme and `@tailwindcss/forms` plugin
+  - `jest.config.ts`: Jest + React Testing Library setup
+
+## Tech Stack Rules
+- **Version Enforcement:**
+  - vite@^5: include `vite-plugin-pwa` for service worker, manifest and offline support
+  - react@18: use `createRoot` API, no legacy `ReactDOM.render`
+  - typescript@^4.9 (strict mode): `noImplicitAny`, `strictNullChecks`
+  - zustand@4 + `zustand/middleware`: must use `persist` for localStorage
+  - tailwindcss@^3: enforce custom theme colors and typography plugin
+  - browser-image-compression@^2: compress profile/logos ≤200 KB and dimensions constraints
+
+## PRD Compliance
+- **Non-Negotiable:**
+  - "Guest login (name, surname, optional profile photo)": must implement onboarding storing user in localStorage
+  - "Data persists after page refresh using localStorage with Zustand and the persist middleware": no other storage allowed
+  - "Compress images to ≤ 200 KB, limit dimensions (150×150 profile, 100×100 logo)": use `browser-image-compression` settings accordingly
+  - "Visual in-app notifications only": implement UI toast components, no Web Push API
+
+## App Flow Integration
+- **Stack-Aligned Flow:**
+  - Onboarding Flow → `src/routes/onboarding.tsx` invokes `userStore.setUser(...)` then redirects to `/dashboard`
+  - Dashboard → `src/routes/dashboard.tsx` renders `ProgressCard`, `ProjectCarousel`, `TaskGroups`, bottom nav component
+  - Project Management →
+    - Create New → `src/routes/project/new.tsx` form component
+    - Edit → `src/routes/project/[id]/edit.tsx`
+    - View → `src/routes/project/[id]/index.tsx`
+  - Task Management → nested under `project/:projectId` with components for add/edit tasks
+  - Calendar & Filters → `src/routes/calendar.tsx` with date navigator and status filter UI
+  - Settings/Profile → `src/routes/settings.tsx` to update guest name and photo
+---
