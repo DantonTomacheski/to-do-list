@@ -224,35 +224,30 @@ const Dashboard: React.FC = () => {
               </div>
             )}
           </div>
-          <div className="relative overflow-hidden">
-            <div
-              ref={projectCarouselRef}
-              className="flex space-x-4 transition-transform duration-300 ease-in-out"
-              style={{
-                transform: `translateX(-${
-                  currentProjectIndex *
-                  (window.innerWidth < 768 ? 100 : 100 / 3)
-                }%)`,
-                width:
-                  window.innerWidth < 768
-                    ? `${projectsWithProgress.length * 100}%`
-                    : projectsWithProgress.length <= 3
-                    ? "100%"
-                    : `${(projectsWithProgress.length / 3) * 100}%`,
-              }}
-            >
-              {projectsWithProgress.length > 0 ? (
-                projectsWithProgress.map((project) => (
+          <div className="relative overflow-hidden w-full">
+            {projectsWithProgress.length > 0 ? (
+              <div
+                ref={projectCarouselRef}
+                className="flex transition-transform duration-300 ease-in-out"
+                style={{
+                  transform: window.innerWidth < 768 
+                    ? `translateX(-${currentProjectIndex * 100}%)` 
+                    : `translateX(-${currentProjectIndex * (100/3)}%)`,
+                  width: window.innerWidth < 768 
+                    ? `${projectsWithProgress.length * 100}%` 
+                    : projectsWithProgress.length <= 3 
+                      ? '100%' 
+                      : `${Math.ceil(projectsWithProgress.length/3) * 100}%`
+                }}
+              >
+                {projectsWithProgress.map((project) => (
                   <div
                     key={project.id}
-                    className={
-                      `px-0.5 ` +
-                      (window.innerWidth < 768
-                        ? "w-full flex-shrink-0"
-                        : projectsWithProgress.length <= 3
-                        ? `w-[${100 / projectsWithProgress.length}%]`
-                        : "w-1/3 flex-shrink-0")
-                    }
+                    className={`px-2 ${window.innerWidth < 768 
+                      ? 'w-full' 
+                      : projectsWithProgress.length <= 3 
+                        ? `w-1/${projectsWithProgress.length}` 
+                        : 'w-1/3'} flex-shrink-0`}
                   >
                     <ProjectCard
                       title={project.title}
@@ -265,19 +260,19 @@ const Dashboard: React.FC = () => {
                       onClick={() => navigate(`/project/${project.id}`)}
                     />
                   </div>
-                ))
-              ) : (
-                <div className="flex flex-col items-center justify-center w-full py-6">
-                  <p className="text-gray-500 mb-3">{t("noProjectsYet")}</p>
-                  <button
-                    className="bg-purple-600 text-white px-4 py-2 rounded-lg"
-                    onClick={() => navigate("/project/new")}
-                  >
-                    {t("createProject")}
-                  </button>
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center w-full py-6">
+                <p className="text-gray-500 mb-3">{t("noProjectsYet")}</p>
+                <button
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg"
+                  onClick={() => navigate("/project/new")}
+                >
+                  {t("createProject")}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
