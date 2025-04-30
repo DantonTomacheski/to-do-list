@@ -60,7 +60,7 @@ const BottomNavigation: React.FC = () => {
 
       <div className="relative">
         <Link to="/project/new" className="flex flex-col items-center">
-          <div className="w-12 h-12 bg-purple rounded-full flex items-center justify-center shadow-lg transform -translate-y-4">
+          <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center shadow-lg transform -translate-y-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 text-white"

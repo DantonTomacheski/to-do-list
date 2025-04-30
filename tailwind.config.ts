@@ -14,11 +14,6 @@ const config: Config = {
           "100%": { width: "500px", height: "500px", opacity: "0" }, // Termina completamente transparente
         },
       },
-      colors: {
-        purple: "#5B3FFF",
-        pink: "#EC4899",
-        orange: "#F97316",
-      },
     },
   },
   plugins: [forms],
