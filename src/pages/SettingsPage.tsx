@@ -18,9 +18,6 @@ const SettingsPage: React.FC = () => {
   const [showConfirmReset, setShowConfirmReset] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [activeTheme, setActiveTheme] = useState(
-    localStorage.getItem("app-theme") || "light"
-  );
 
   // Handle profile update
   const handleProfileUpdate = () => {
@@ -69,30 +66,6 @@ const SettingsPage: React.FC = () => {
     useTaskStore.getState().resetAllData();
     localStorage.clear();
     navigate("/welcome");
-  };
-
-  // Handle theme change
-  const handleThemeChange = (theme: "light" | "dark" | "system") => {
-    setActiveTheme(theme);
-    localStorage.setItem("app-theme", theme);
-
-    // Apply theme
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else if (theme === "light") {
-      document.documentElement.classList.remove("dark");
-    } else {
-      // System preference
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    }
-
-    setSnackbarMessage(t("themeUpdated"));
-    setShowSnackbar(true);
-    setTimeout(() => setShowSnackbar(false), 3000);
   };
 
   return (

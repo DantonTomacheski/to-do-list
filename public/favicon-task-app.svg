@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 64 64"
+  width="64"
+  height="64"
+  fill="none"
+>
+  <!-- backdrop with soft radius -->
+  <rect
+    x="4"
+    y="4"
+    width="56"
+    height="56"
+    rx="14"
+    fill="#5B3FFF"
+  />
+  <!-- subtle inner shadow for depth -->
+  <rect
+    x="4"
+    y="4"
+    width="56"
+    height="56"
+    rx="14"
+    fill="url(#shadow)"
+  />
+
+  <!-- check mark -->
+  <path
+    d="M22 33.5L29 40.5L43 24"
+    stroke="white"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <defs>
+    <!-- radial dark overlay for inner-shadow illusion -->
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.8">
+      <stop offset="0%" stop-color="#000" stop-opacity="0" />
+      <stop offset="100%" stop-color="#000" stop-opacity="0.08" />
+    </radialGradient>
+  </defs>
+</svg>
