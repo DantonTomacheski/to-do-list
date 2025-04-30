@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Upload, X } from "lucide-react";
 import { compressImageToBase64 } from "@/utils/imageCompression";
 import { useUserStore } from "@/store/userStore";
+import defaultAvatarImage from "../assets/avatar/2.png";
 
 interface PhotoUploadProps {
   onChange: (photoBase64: string | null) => void;
@@ -26,10 +27,10 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
 
     try {
       const compressedImageBase64 = await compressImageToBase64(file);
-      
+
       // Call the provided onChange callback
       onChange(compressedImageBase64);
-      
+
       // Also update the user store directly
       const updateUser = useUserStore.getState().updateUser;
       updateUser({ photo: compressedImageBase64 });
@@ -50,7 +51,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
   const removePhoto = () => {
     // Call the provided onChange callback
     onChange(null);
-    
+
     // Also update the user store directly
     const updateUser = useUserStore.getState().updateUser;
     updateUser({ photo: null });
@@ -79,7 +80,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
           <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
             {/* Directly display the fixed default avatar if value is null/empty */}
             <img
-              src="https://avatar.iran.liara.run/public/2" // Use fixed default URL
+              src={defaultAvatarImage}
               alt={t("defaultAvatar", "Default Avatar")}
               className="w-full h-full object-cover"
             />

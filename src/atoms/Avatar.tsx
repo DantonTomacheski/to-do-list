@@ -1,5 +1,6 @@
 import React from 'react'
 import { useUserStore } from '../store/userStore'
+import defaultAvatarImage from '../assets/avatar/2.png'
 
 interface AvatarProps {
   size?: 'sm' | 'md' | 'lg'
@@ -15,7 +16,7 @@ const Avatar: React.FC<AvatarProps> = ({ size = 'md', className = '' }) => {
     lg: 'w-12 h-12'
   }
   
-  const defaultImage = 'https://avatar.iran.liara.run/public/2'
+  const defaultImage = defaultAvatarImage
   const imageUrl = user?.photo || defaultImage
   
   return (

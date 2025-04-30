@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import Avatar from "../Avatar";
+import defaultAvatarImage from "../../assets/avatar/2.png";
 
 describe("Avatar", () => {
   it("renders correctly with default props", () => {
@@ -40,7 +41,7 @@ describe("Avatar", () => {
     const avatar = screen.getByAltText("Test User");
     expect(avatar).toHaveAttribute(
       "src",
-      "https://avatar.iran.liara.run/public/2"
+      defaultAvatarImage
     );
   });
 });

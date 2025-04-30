@@ -8,8 +8,18 @@ interface ProgressCardProps {
   total?: number;
 }
 
+import { useNavigate } from "react-router-dom";
+
 const ProgressCard: React.FC<ProgressCardProps> = ({ percentage, completed, total }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  // Obter data de hoje no formato yyyy-MM-dd
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${yyyy}-${mm}-${dd}`;
 
   return (
     <div className="bg-purple-600 p-4 rounded-xl text-white relative overflow-hidden">
@@ -21,7 +31,10 @@ const ProgressCard: React.FC<ProgressCardProps> = ({ percentage, completed, tota
               {completed} / {total} {t("tasks")}
             </p>
           )}
-          <button className="bg-white/20 backdrop-blur-sm text-white px-6 py-2 rounded-lg mt-4 hover:bg-white/30 transition-all duration-200">
+          <button
+            className="bg-white/20 backdrop-blur-sm text-white px-6 py-2 rounded-lg mt-4 hover:bg-white/30 transition-all duration-200"
+            onClick={() => navigate(`/calendar?date=${todayStr}`)}
+          >
             {t("viewTask")}
           </button>
         </div>

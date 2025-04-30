@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-// import { format } from 'date-fns';
 import HeaderBar from "../molecules/HeaderBar";
 import HorizontalCalendar from "../molecules/HorizontalCalendar";
 import StatusFilterBar from "../molecules/StatusFilterBar";
@@ -31,6 +30,7 @@ interface ProjectTasksTemplateProps {
   ) => void;
   getProjectName: (projectId: string) => string;
   getProjectColor: (projectId: string) => string;
+  onBack?: () => void; // Adicionando a propriedade onBack como opcional
 }
 
 const ProjectTasksTemplate: React.FC<ProjectTasksTemplateProps> = ({

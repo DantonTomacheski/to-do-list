@@ -27,25 +27,27 @@ const Dashboard: React.FC = () => {
 
   // Get projects with progress information
   const projectsWithProgress = useMemo(() => {
-    return getProjectsWithProgress()
-      .map((project) => ({
-        id: project.id,
-        title: project.name,
-        category: project.description || "",
-        progress: project.progress,
-        icon: project.icon, // Include the icon if it exists
-        color: project.color.includes("blue")
-          ? "blue"
-          : project.color.includes("orange")
-          ? "orange"
-          : project.color.includes("purple")
-          ? "purple"
-          : "green",
-        // Store the original description length for sorting
-        descriptionLength: (project.description || "").length
-      }))
-      // Sort by description length (longer descriptions first)
-      .sort((a, b) => b.descriptionLength - a.descriptionLength);
+    return (
+      getProjectsWithProgress()
+        .map((project) => ({
+          id: project.id,
+          title: project.name,
+          category: project.description || "",
+          progress: project.progress,
+          icon: project.icon, // Include the icon if it exists
+          color: project.color.includes("blue")
+            ? "blue"
+            : project.color.includes("orange")
+            ? "orange"
+            : project.color.includes("purple")
+            ? "purple"
+            : "green",
+          // Store the original description length for sorting
+          descriptionLength: (project.description || "").length,
+        }))
+        // Sort by description length (longer descriptions first)
+        .sort((a, b) => b.descriptionLength - a.descriptionLength)
+    );
   }, [getProjectsWithProgress]);
 
   // Group tasks by project for task groups display
@@ -140,50 +142,117 @@ const Dashboard: React.FC = () => {
                 {projectsWithProgress.length}
               </span>
             </h2>
-            {projectsWithProgress.length > 3 && (
+            {projectsWithProgress.length >
+              (window.innerWidth < 768 ? 1 : 3) && (
               <div className="flex space-x-2">
                 <button
                   onClick={() => {
-                    setCurrentProjectIndex(Math.max(0, currentProjectIndex - 1));
+                    setCurrentProjectIndex(
+                      Math.max(
+                        0,
+                        currentProjectIndex - (window.innerWidth < 768 ? 1 : 3)
+                      )
+                    );
                   }}
                   disabled={currentProjectIndex === 0}
-                  className={`p-1.5 rounded-full ${currentProjectIndex === 0 ? 'bg-gray-100 text-gray-400' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+                  className={`p-1.5 rounded-full ${
+                    currentProjectIndex === 0
+                      ? "bg-gray-100 text-gray-400"
+                      : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  }`}
                   aria-label="Previous projects"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 19.5 8.25 12l7.5-7.5"
+                    />
                   </svg>
                 </button>
                 <button
                   onClick={() => {
-                    setCurrentProjectIndex(Math.min(projectsWithProgress.length - 3, currentProjectIndex + 1));
+                    const maxIndex =
+                      window.innerWidth < 768
+                        ? projectsWithProgress.length - 1
+                        : projectsWithProgress.length - 3;
+                    setCurrentProjectIndex(
+                      Math.min(
+                        maxIndex,
+                        currentProjectIndex + (window.innerWidth < 768 ? 1 : 3)
+                      )
+                    );
                   }}
-                  disabled={currentProjectIndex >= projectsWithProgress.length - 3}
-                  className={`p-1.5 rounded-full ${currentProjectIndex >= projectsWithProgress.length - 3 ? 'bg-gray-100 text-gray-400' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+                  disabled={
+                    currentProjectIndex >=
+                    (window.innerWidth < 768
+                      ? projectsWithProgress.length - 1
+                      : projectsWithProgress.length - 3)
+                  }
+                  className={`p-1.5 rounded-full ${
+                    currentProjectIndex >=
+                    (window.innerWidth < 768
+                      ? projectsWithProgress.length - 1
+                      : projectsWithProgress.length - 3)
+                      ? "bg-gray-100 text-gray-400"
+                      : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  }`}
                   aria-label="Next projects"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                    />
                   </svg>
                 </button>
               </div>
             )}
           </div>
           <div className="relative overflow-hidden">
-            <div 
+            <div
               ref={projectCarouselRef}
               className="flex space-x-4 transition-transform duration-300 ease-in-out"
-              style={{ 
-                transform: `translateX(-${currentProjectIndex * (100 / 3)}%)`,
-                width: projectsWithProgress.length <= 3 ? '100%' : `${(projectsWithProgress.length / 3) * 100}%`
+              style={{
+                transform: `translateX(-${
+                  currentProjectIndex *
+                  (window.innerWidth < 768 ? 100 : 100 / 3)
+                }%)`,
+                width:
+                  window.innerWidth < 768
+                    ? `${projectsWithProgress.length * 100}%`
+                    : projectsWithProgress.length <= 3
+                    ? "100%"
+                    : `${(projectsWithProgress.length / 3) * 100}%`,
               }}
             >
               {projectsWithProgress.length > 0 ? (
                 projectsWithProgress.map((project) => (
-                  <div 
-                    key={project.id} 
-                    className="px-0.5" 
-                    style={{ width: projectsWithProgress.length <= 3 ? `${100 / projectsWithProgress.length}%` : '33.333%' }}
+                  <div
+                    key={project.id}
+                    className={
+                      `px-0.5 ` +
+                      (window.innerWidth < 768
+                        ? "w-full flex-shrink-0"
+                        : projectsWithProgress.length <= 3
+                        ? `w-[${100 / projectsWithProgress.length}%]`
+                        : "w-1/3 flex-shrink-0")
+                    }
                   >
                     <ProjectCard
                       title={project.title}
