@@ -51,6 +51,9 @@ interface TaskStore {
   selectDate: (date: string) => void
   setStatusFilter: (filter: 'All' | TaskStatus) => void
   
+  // Data management
+  resetAllData: () => void
+  
   // Getters
   getTasksForDate: (date: string) => Task[]
   getFilteredTasksForDate: () => Task[]
@@ -287,6 +290,17 @@ export const useTaskStore = create<TaskStore>()(
             ? Math.round((completedTasks.length / todayTasks.length) * 100) 
             : 0
         }
+      },
+      
+      // Reset all data in the store
+      resetAllData: () => {
+        set({
+          tasks: [],
+          projects: [],
+          selectedDate: new Date().toISOString().split('T')[0],
+          activeStatusFilter: 'All',
+          isLoading: false
+        })
       }
     }),
     {

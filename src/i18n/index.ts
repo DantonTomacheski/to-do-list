@@ -38,7 +38,7 @@ const resources = {
       changeLanguage: "Mudar Idioma",
       home: "Início",
       calendar: "Calendário",
-      addNew: "Adicionar",
+      addNew: "Adicionar Projeto",
       profile: "Perfil",
 
       // Calendar
@@ -65,7 +65,8 @@ const resources = {
       time: "Horário",
       optional: "opcional",
       priority: "Prioridade",
-      addYourFirstTaskToThisProject: "Adicione sua primeira tarefa a este projeto",
+      addYourFirstTaskToThisProject:
+        "Adicione sua primeira tarefa a este projeto",
       noTasksYet: "Sem tarefas ainda",
       dataError: "Não foi possível carregar tarefas. Redefinir dados?",
       resetData: "Redefinir Dados",
@@ -81,6 +82,11 @@ const resources = {
       low: "Baixa",
       medium: "Média",
       high: "Alta",
+      
+      // Tasks Page
+      searchTasks: "Buscar tarefas",
+      allTasks: "Todas as tarefas",
+      noTasksFound: "Nenhuma tarefa encontrada com estes critérios",
 
       // Project Form
       addProject: "Adicionar Projeto",
@@ -132,6 +138,31 @@ const resources = {
       imageProcessingError: "Erro ao processar imagem",
       notifications: "Notificações",
       noNotifications: "Nenhuma notificação",
+      
+      // Settings Page
+      settings: "Configurações",
+      profileSettings: "Configurações de Perfil",
+      appearance: "Aparência",
+      dataManagement: "Gerenciamento de Dados",
+      appInfo: "Informações do App",
+      version: "Versão",
+      lastUpdate: "Última Atualização",
+      dataStoredLocally: "Dados Armazenados Localmente",
+      yes: "Sim",
+      no: "Não",
+      logout: "Sair",
+      resetAllData: "Apagar Todos os Dados",
+      confirmLogout: "Confirmar Saída",
+      logoutConfirmMessage: "Tem certeza que deseja sair da sua conta? Seus dados permanecerão salvos.",
+      confirmReset: "Confirmar Reset",
+      resetConfirmMessage: "Tem certeza que deseja apagar todos os dados? Esta ação não pode ser desfeita.",
+      profileUpdated: "Perfil atualizado com sucesso!",
+      photoUpdated: "Foto atualizada com sucesso!",
+      photoRemoved: "Foto removida com sucesso!",
+      lightTheme: "Claro",
+      darkTheme: "Escuro",
+      systemTheme: "Sistema",
+      themeUpdated: "Tema atualizado com sucesso!",
     },
   },
   "en-US": {
@@ -169,7 +200,7 @@ const resources = {
       changeLanguage: "Change Language",
       home: "Home",
       calendar: "Calendar",
-      addNew: "Add New",
+      addNew: "Add New Project",
       profile: "Profile",
 
       // Calendar
@@ -211,6 +242,11 @@ const resources = {
       low: "Low",
       medium: "Medium",
       high: "High",
+      
+      // Tasks Page
+      searchTasks: "Search tasks",
+      allTasks: "All tasks",
+      noTasksFound: "No tasks found with these criteria",
 
       // Project Form
       addProject: "Add Project",
@@ -263,6 +299,31 @@ const resources = {
       imageProcessingError: "Error processing image",
       notifications: "Notifications",
       noNotifications: "No notifications",
+      
+      // Settings Page
+      settings: "Settings",
+      profileSettings: "Profile Settings",
+      appearance: "Appearance",
+      dataManagement: "Data Management",
+      appInfo: "App Info",
+      version: "Version",
+      lastUpdate: "Last Update",
+      dataStoredLocally: "Data Stored Locally",
+      yes: "Yes",
+      no: "No",
+      logout: "Logout",
+      resetAllData: "Reset All Data",
+      confirmLogout: "Confirm Logout",
+      logoutConfirmMessage: "Are you sure you want to log out? Your data will remain saved.",
+      confirmReset: "Confirm Reset",
+      resetConfirmMessage: "Are you sure you want to delete all your data? This action cannot be undone.",
+      profileUpdated: "Profile updated successfully!",
+      photoUpdated: "Photo updated successfully!",
+      photoRemoved: "Photo removed successfully!",
+      lightTheme: "Light",
+      darkTheme: "Dark",
+      systemTheme: "System",
+      themeUpdated: "Theme updated successfully!",
     },
   },
 };

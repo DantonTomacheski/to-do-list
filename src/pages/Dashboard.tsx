@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import DashboardHeader from "../molecules/DashboardHeader";
@@ -12,6 +12,8 @@ import { useUserStore } from "../store/userStore";
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
+  const projectCarouselRef = useRef<HTMLDivElement>(null);
 
   // Get user data from store - will be used in DashboardHeader
   useUserStore((state) => state.user);
@@ -25,19 +27,25 @@ const Dashboard: React.FC = () => {
 
   // Get projects with progress information
   const projectsWithProgress = useMemo(() => {
-    return getProjectsWithProgress().map((project) => ({
-      id: project.id,
-      title: project.name,
-      category: project.description || "",
-      progress: project.progress,
-      color: project.color.includes("blue")
-        ? "blue"
-        : project.color.includes("orange")
-        ? "orange"
-        : project.color.includes("purple")
-        ? "purple"
-        : "green",
-    }));
+    return getProjectsWithProgress()
+      .map((project) => ({
+        id: project.id,
+        title: project.name,
+        category: project.description || "",
+        progress: project.progress,
+        icon: project.icon, // Include the icon if it exists
+        color: project.color.includes("blue")
+          ? "blue"
+          : project.color.includes("orange")
+          ? "orange"
+          : project.color.includes("purple")
+          ? "purple"
+          : "green",
+        // Store the original description length for sorting
+        descriptionLength: (project.description || "").length
+      }))
+      // Sort by description length (longer descriptions first)
+      .sort((a, b) => b.descriptionLength - a.descriptionLength);
   }, [getProjectsWithProgress]);
 
   // Group tasks by project for task groups display
@@ -132,32 +140,75 @@ const Dashboard: React.FC = () => {
                 {projectsWithProgress.length}
               </span>
             </h2>
-          </div>
-          <div className="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide">
-            {projectsWithProgress.length > 0 ? (
-              projectsWithProgress.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  title={project.title}
-                  category={project.category}
-                  progress={project.progress}
-                  color={
-                    project.color as "blue" | "orange" | "purple" | "green"
-                  }
-                  onClick={() => navigate(`/project/${project.id}`)}
-                />
-              ))
-            ) : (
-              <div className="flex flex-col items-center justify-center w-full py-6">
-                <p className="text-gray-500 mb-3">{t("noProjectsYet")}</p>
+            {projectsWithProgress.length > 3 && (
+              <div className="flex space-x-2">
                 <button
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg"
-                  onClick={() => navigate("/project/new")}
+                  onClick={() => {
+                    setCurrentProjectIndex(Math.max(0, currentProjectIndex - 1));
+                  }}
+                  disabled={currentProjectIndex === 0}
+                  className={`p-1.5 rounded-full ${currentProjectIndex === 0 ? 'bg-gray-100 text-gray-400' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+                  aria-label="Previous projects"
                 >
-                  {t("createProject")}
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => {
+                    setCurrentProjectIndex(Math.min(projectsWithProgress.length - 3, currentProjectIndex + 1));
+                  }}
+                  disabled={currentProjectIndex >= projectsWithProgress.length - 3}
+                  className={`p-1.5 rounded-full ${currentProjectIndex >= projectsWithProgress.length - 3 ? 'bg-gray-100 text-gray-400' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+                  aria-label="Next projects"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                  </svg>
                 </button>
               </div>
             )}
+          </div>
+          <div className="relative overflow-hidden">
+            <div 
+              ref={projectCarouselRef}
+              className="flex space-x-4 transition-transform duration-300 ease-in-out"
+              style={{ 
+                transform: `translateX(-${currentProjectIndex * (100 / 3)}%)`,
+                width: projectsWithProgress.length <= 3 ? '100%' : `${(projectsWithProgress.length / 3) * 100}%`
+              }}
+            >
+              {projectsWithProgress.length > 0 ? (
+                projectsWithProgress.map((project) => (
+                  <div 
+                    key={project.id} 
+                    className="px-0.5" 
+                    style={{ width: projectsWithProgress.length <= 3 ? `${100 / projectsWithProgress.length}%` : '33.333%' }}
+                  >
+                    <ProjectCard
+                      title={project.title}
+                      category={project.category}
+                      progress={project.progress}
+                      icon={project.icon}
+                      color={
+                        project.color as "blue" | "orange" | "purple" | "green"
+                      }
+                      onClick={() => navigate(`/project/${project.id}`)}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center w-full py-6">
+                  <p className="text-gray-500 mb-3">{t("noProjectsYet")}</p>
+                  <button
+                    className="bg-purple-600 text-white px-4 py-2 rounded-lg"
+                    onClick={() => navigate("/project/new")}
+                  >
+                    {t("createProject")}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

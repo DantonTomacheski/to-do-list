@@ -5,6 +5,8 @@ import Dashboard from '../pages/Dashboard'
 import Calendar from '../pages/Calendar'
 import ProjectForm from '../pages/ProjectForm'
 import ProjectTasksPage from '../pages/ProjectTasksPage'
+import TasksPage from '../pages/TasksPage'
+import SettingsPage from '../pages/SettingsPage'
 import { useUserStore } from '../store/userStore'
 
 const Routes: React.FC = () => {
@@ -43,6 +45,14 @@ const Routes: React.FC = () => {
     {
       path: '/project/:id/tasks',
       element: isOnboarded ? <ProjectTasksPage /> : <Navigate to="/welcome" />,
+    },
+    {
+      path: '/tasks',
+      element: isOnboarded ? <TasksPage /> : <Navigate to="/welcome" />,
+    },
+    {
+      path: '/settings',
+      element: isOnboarded ? <SettingsPage /> : <Navigate to="/welcome" />,
     },
     // Other routes will be added here
   ])
