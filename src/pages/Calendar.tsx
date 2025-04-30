@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { format, addDays, subDays, startOfWeek, addWeeks, subWeeks, parse } from 'date-fns'
 import { ptBR, enUS } from 'date-fns/locale'
 
@@ -9,10 +9,11 @@ import DayChip from '../atoms/DayChip'
 import StatusFilterChip from '../atoms/StatusFilterChip'
 import TaskCard from '../molecules/TaskCard'
 import BottomNavigation from '../molecules/BottomNavigation'
+import HeaderBar from '../molecules/HeaderBar'
+import TaskFormModal from '../organisms/TaskFormModal'
 
 const Calendar: React.FC = () => {
   const { t, i18n } = useTranslation()
-  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const locale = i18n.language === 'pt-BR' ? ptBR : enUS
   
@@ -33,10 +34,11 @@ const Calendar: React.FC = () => {
   // We use error for potential localStorage corruption, initialized as null
   const [error] = useState<string | null>(null)
   const [showDatePicker, setShowDatePicker] = useState(false)
-  const [showNotifications, setShowNotifications] = useState(false)
   const [showSnackbar, setShowSnackbar] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showTaskModal, setShowTaskModal] = useState(false)
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   
   // Ref for pull-to-refresh
   const listRef = useRef<HTMLDivElement>(null)
@@ -73,8 +75,18 @@ const Calendar: React.FC = () => {
   // Get filtered tasks for the selected date
   const tasks = getFilteredTasksForDate()
   
-  // Generate days for the week
-  const weekDays = Array.from({ length: 7 }).map((_, index) => {
+  // Effect to update mobile status on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Generate days based on screen size (7 for mobile, 14 for desktop)
+  const weekDays = Array.from({ length: isMobile ? 7 : 14 }).map((_, index) => {
     return addDays(currentWeek, index)
   })
   
@@ -196,41 +208,8 @@ const Calendar: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Top Bar */}
-      <div className="bg-white p-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center">
-          <button 
-            className="mr-2 active:scale-95"
-            onClick={() => navigate(-1)}
-            aria-label={t('back')}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-lg font-semibold text-gray-800">{t('todaysTasks')}</h1>
-        </div>
-        
-        <button 
-          className="relative"
-          onClick={() => setShowNotifications(!showNotifications)}
-          aria-label="Notifications"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-        </button>
-        
-        {/* Notifications Popover */}
-        {showNotifications && (
-          <div className="absolute top-16 right-4 bg-white rounded-xl shadow-lg w-72 p-3 z-20 animate-slide-down">
-            <h3 className="font-medium text-gray-800 mb-2">{t('notifications')}</h3>
-            <div className="border-t border-gray-100 py-2">
-              <p className="text-gray-500 text-sm">{t('noNotifications')}</p>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Header Bar */}
+      <HeaderBar title={t('calendar')} titleId="calendarTitle" />
       
       {/* Day Selector */}
       <div className="my-4 px-4">
@@ -245,9 +224,12 @@ const Calendar: React.FC = () => {
             </svg>
           </button>
           
-          <span className="font-medium text-gray-800">
+          <button 
+            onClick={() => setShowDatePicker(true)}
+            className="font-medium text-gray-800 hover:text-purple-600 transition-colors px-2 py-1 rounded"
+          >
             {format(currentWeek, 'MMMM yyyy', { locale })}
-          </span>
+          </button>
           
           <button 
             onClick={handleNextWeek}
@@ -260,15 +242,28 @@ const Calendar: React.FC = () => {
           </button>
         </div>
         
-        <div className="flex overflow-x-auto py-2 scrollbar-hide">
+        <div 
+          className="flex overflow-x-auto py-2 scrollbar-hide scroll-smooth" 
+          style={{ 
+            WebkitOverflowScrolling: 'touch',
+            scrollBehavior: 'smooth',
+            scrollSnapType: 'x mandatory',
+            paddingBottom: '10px'
+          }}
+        >
           {weekDays.map((date) => (
-            <DayChip 
-              key={format(date, 'yyyy-MM-dd')}
-              date={date}
-              isSelected={format(date, 'yyyy-MM-dd') === selectedDate}
-              onClick={() => handleDaySelect(date)}
-              onLongPress={handleDayLongPress}
-            />
+            <div 
+              key={format(date, 'yyyy-MM-dd')} 
+              className="scroll-snap-align-start flex-shrink-0"
+              style={{ scrollSnapAlign: 'start' }}
+            >
+              <DayChip 
+                date={date}
+                isSelected={format(date, 'yyyy-MM-dd') === selectedDate}
+                onClick={() => handleDaySelect(date)}
+                onLongPress={handleDayLongPress}
+              />
+            </div>
           ))}
         </div>
         
@@ -282,6 +277,15 @@ const Calendar: React.FC = () => {
                 className="w-full p-2 border border-gray-300 rounded-lg mb-4"
                 value={selectedDate}
                 onChange={handleDatePickerChange}
+                onFocus={(e) => {
+                  // This forces the date picker to open on mobile
+                  if (e.target) {
+                    const target = e.target as HTMLInputElement;
+                    if (target.showPicker) {
+                      target.showPicker();
+                    }
+                  }
+                }}
               />
               <button 
                 className="w-full bg-purple-600 text-white py-2 rounded-lg"
@@ -296,7 +300,7 @@ const Calendar: React.FC = () => {
       
       {/* Status Filter Bar */}
       <div className="my-4 px-4">
-        <div className="flex overflow-x-auto py-2 gap-2 scrollbar-hide">
+        <div className="flex justify-between py-2 gap-2 w-full bg-white rounded-lg shadow-sm p-2">
           <StatusFilterChip 
             status="All"
             isActive={activeStatusFilter === 'All'}
@@ -382,7 +386,7 @@ const Calendar: React.FC = () => {
             <p className="text-gray-500 mt-4 mb-6">{t('noTasksForDay')}</p>
             <button 
               className="bg-purple-600 text-white px-4 py-2 rounded-lg"
-              onClick={() => navigate(`/tasks/new?date=${selectedDate}`)}
+              onClick={() => setShowTaskModal(true)}
             >
               {t('addTask')}
             </button>
@@ -414,7 +418,7 @@ const Calendar: React.FC = () => {
       {/* FAB for Add Task */}
       <button 
         className="fixed right-4 bottom-20 bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
-        onClick={() => navigate(`/tasks/new?date=${selectedDate}`)}
+        onClick={() => setShowTaskModal(true)}
         aria-label={t('addTask')}
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -431,6 +435,27 @@ const Calendar: React.FC = () => {
       
       {/* Bottom Navigation */}
       <BottomNavigation />
+      
+      {/* Task Form Modal */}
+      <TaskFormModal
+        isOpen={showTaskModal}
+        onClose={() => setShowTaskModal(false)}
+        onSubmit={taskData => {
+          // Pass the task data to the task store
+          const { addTask } = useTaskStore.getState();
+          addTask(taskData);
+          setShowTaskModal(false);
+          
+          // Show success message
+          setSnackbarMessage(t('taskAdded'));
+          setShowSnackbar(true);
+          setTimeout(() => {
+            setShowSnackbar(false);
+          }, 3000);
+        }}
+        projectId="" // Will need to be updated if project selection is added
+        selectedDate={selectedDate ? new Date(selectedDate) : new Date()}
+      />
     </div>
   )
 }

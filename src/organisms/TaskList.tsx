@@ -1,12 +1,12 @@
 import React from 'react';
 import TaskCard from '../molecules/TaskCard';
 import { Task, TaskStatus } from '../store/taskStore';
-import { useTranslation } from 'react-i18next';
 
 interface TaskListProps {
   tasks: Task[];
   onStatusChange: (taskId: string, newStatus: TaskStatus) => void;
   onDelete: (taskId: string) => void;
+  onEdit?: (taskId: string, updatedTaskData: Omit<Task, "id" | "createdAt" | "updatedAt">) => void;
   isLoading?: boolean;
   getProjectName?: (projectId: string) => string;
   getProjectColor?: (projectId: string) => string;
@@ -16,11 +16,11 @@ const TaskList: React.FC<TaskListProps> = ({
   tasks,
   onStatusChange,
   onDelete,
+  onEdit,
   isLoading = false,
   getProjectName,
   getProjectColor
 }) => {
-  const { t } = useTranslation();
 
   if (isLoading) {
     // Return skeleton loaders when loading
@@ -58,6 +58,7 @@ const TaskList: React.FC<TaskListProps> = ({
           task={task}
           onStatusChange={onStatusChange}
           onDelete={onDelete}
+          onEdit={onEdit}
           projectName={task.projectId && getProjectName ? getProjectName(task.projectId) : undefined}
           projectColor={task.projectId && getProjectColor ? getProjectColor(task.projectId) : undefined}
         />

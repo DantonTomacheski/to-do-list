@@ -1,12 +1,14 @@
 import React, { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Task, TaskStatus } from '../store/taskStore'
-import { useNavigate } from 'react-router-dom'
+import { CheckCircle, Circle, Clock, Edit } from 'lucide-react'
+import TaskFormModal from '../organisms/TaskFormModal'
 
 interface TaskCardProps {
   task: Task
   onStatusChange: (taskId: string, newStatus: TaskStatus) => void
   onDelete: (taskId: string) => void
+  onEdit?: (taskId: string, updatedTask: Omit<Task, "id" | "createdAt" | "updatedAt">) => void
   projectName?: string
   projectColor?: string
 }
@@ -15,11 +17,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   task, 
   onStatusChange, 
   onDelete,
+  onEdit,
   projectName,
   projectColor = 'bg-purple-100 text-purple-800' 
 }) => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   
   // Touch handling for swipe gestures
   const [touchStart, setTouchStart] = useState<number | null>(null)
@@ -36,6 +38,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
     'To-do': 'bg-blue-100 text-blue-800',
     'In Progress': 'bg-orange-100 text-orange-800',
     'Done': 'bg-green-100 text-green-800'
+  }
+  
+  // Status icons
+  const statusIcons = {
+    'To-do': <Circle className="w-4 h-4 mr-1" />,
+    'In Progress': <Clock className="w-4 h-4 mr-1" />,
+    'Done': <CheckCircle className="w-4 h-4 mr-1" fill="#84cc16" />
   }
 
   // Next status in the cycle
@@ -114,7 +123,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
   // Handle card click
   const handleCardClick = () => {
     if (!swiping && swipeDirection === 'none') {
-      navigate(`/projects/${task.projectId || 'none'}/tasks?task=${task.id}`)
+      // Abrimos o modal de edição em vez de navegar para uma rota
+      setShowEditModal(true)
     }
   }
   
@@ -123,9 +133,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
     setShowActionDrawer(false)
   }
   
-  // Edit task
+  // Edit task - agora vai abrir o modal em vez de navegar
+  const [showEditModal, setShowEditModal] = useState(false);
+  
   const handleEdit = () => {
-    navigate(`/projects/${task.projectId || 'none'}/tasks/edit/${task.id}`)
+    setShowEditModal(true)
     closeActionDrawer()
   }
   
@@ -134,6 +146,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
     onDelete(task.id)
     closeActionDrawer()
   }
+
+  // Função para lidar com a edição de tarefa
+  const handleUpdateTask = (updatedTaskData: Omit<Task, "id" | "createdAt" | "updatedAt">) => {
+    // Chamamos a função onEdit se fornecida
+    if (onEdit) {
+      onEdit(task.id, updatedTaskData);
+    }
+    setShowEditModal(false);
+  };
 
   return (
     <div className="relative">
@@ -148,8 +169,30 @@ const TaskCard: React.FC<TaskCardProps> = ({
       >
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-medium text-gray-800 flex-1">{task.title}</h3>
-          <div className={`px-2 py-1 rounded-full text-xs ${statusStyles[task.status]}`}>
-            {t(task.status.toLowerCase().replace(/\s+/g, ''))}
+          <div className="flex items-center">
+            {/* Botão de editar */}
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEdit();
+              }}
+              className="p-1.5 mr-2 bg-purple-100 rounded-full hover:bg-purple-200 transition-colors"
+              aria-label={t('edit')}
+            >
+              <Edit className="w-4 h-4 text-purple-700" />
+            </button>
+            
+            {/* Status Badge */}
+            <div 
+              className={`px-2 py-1 rounded-full text-xs ${statusStyles[task.status]} flex items-center cursor-pointer`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onStatusChange(task.id, getNextStatus(task.status));
+              }}
+            >
+              {statusIcons[task.status]}
+              {t(task.status.toLowerCase().replace(/\s+/g, ''))}
+            </div>
           </div>
         </div>
         
@@ -158,38 +201,50 @@ const TaskCard: React.FC<TaskCardProps> = ({
         )}
         
         <div className="flex justify-between items-center">
-          {task.time && (
-            <div className="flex items-center text-gray-500 text-xs">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{task.time}</span>
-            </div>
-          )}
-          
-          {projectName && (
-            <div className={`px-2 py-1 rounded-full text-xs ${projectColor}`}>
-              {projectName}
-            </div>
-          )}
-          
-          {task.priority && (
-            <div className={`flex items-center text-xs ${
-              task.priority === 'High' ? 'text-red-600' : 
-              task.priority === 'Medium' ? 'text-orange-600' : 
-              'text-blue-600'
-            }`}>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-              </svg>
-              <span>{t(task.priority.toLowerCase())}</span>
-            </div>
-          )}
+          <div 
+            className={`px-2 py-1 rounded-full text-xs ${statusStyles[task.status]} flex items-center cursor-pointer`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onStatusChange(task.id, getNextStatus(task.status));
+            }}
+            aria-label={t('changeStatus')}
+          >
+            {statusIcons[task.status]}
+            {t(task.status.toLowerCase().replace(/\s+/g, ''))}
+          </div>
+
+          <div className="flex items-center space-x-2">
+            {task.time && (
+              <div className="flex items-center text-gray-500 text-xs">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{task.time}</span>
+              </div>
+            )}
+            
+            {projectName && (
+              <div className={`px-2 py-1 rounded-full text-xs ${projectColor}`}>
+                {projectName}
+              </div>
+            )}
+            
+            {task.priority && (
+              <div className={`flex items-center text-xs ${
+                task.priority === 'High' ? 'text-red-600' : 
+                task.priority === 'Medium' ? 'text-orange-600' : 
+                'text-blue-600'
+              }`}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+                <span>{t(task.priority.toLowerCase())}</span>
+              </div>
+            )}
+          </div>
         </div>
-        
-        {/* Swipe instructions for screen readers */}
         <div className="sr-only">
-          {t('swipeRightToUpdateStatus')}. {t('swipeLeftForActions')}
+          {t('swipeRightToUpdateStatus')}. {t('swipeLeftForActions')}. {t('clickOnStatusToUpdate')}. {t('clickOnEditToEdit')}.
         </div>
       </div>
       
@@ -227,6 +282,19 @@ const TaskCard: React.FC<TaskCardProps> = ({
             </div>
           </div>
         </>
+      )}
+      
+      {/* Modal de edição */}
+      {showEditModal && (
+        <TaskFormModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSubmit={handleUpdateTask}
+          projectId={task.projectId || ''}
+          selectedDate={new Date(task.date)}
+          initialTask={task}
+          isEditing={true}
+        />
       )}
     </div>
   )

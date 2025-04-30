@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import WelcomeHeader from "../molecules/WelcomeHeader";
 import UserRegistrationForm from "../molecules/UserRegistrationForm";
 import { Button } from "../atoms/Button";
+import LanguageSelector from "../atoms/LanguageSelector";
 import { User } from "../store/userStore";
 
 interface WelcomeContentProps {
@@ -31,6 +32,7 @@ const WelcomeContent: React.FC<WelcomeContentProps> = ({
       {!showForm ? (
         <>
           <WelcomeHeader className="mb-8" />
+          <LanguageSelector className="mb-4" />
           <div className="text-center">
             <Button size="lg" icon={<ArrowRight />} onClick={handleStartClick}>
               {t("letsStart")}
