@@ -1,0 +1,14 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:5173",
+      "localStorage": [
+        {
+          "name": "user-storage",
+          "value": "{\"state\":{\"user\":{\"firstName\":\"Danton\",\"lastName\":\"Tomacheski\"},\"isOnboarded\":true},\"version\":0}"
+        }
+      ]
+    }
+  ]
+}
