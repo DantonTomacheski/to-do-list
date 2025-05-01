@@ -1,4 +1,4 @@
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 import React, { forwardRef } from "react";
 
 // Field Label Component
@@ -210,6 +210,7 @@ export const LogoTile: React.FC<LogoTileProps> = ({
   onClick,
   onLongPress,
 }) => {
+  const { t } = useTranslation();
   // For long press detection
   const timer = React.useRef<NodeJS.Timeout | null>(null);
   const [pressing, setPressing] = React.useState(false);

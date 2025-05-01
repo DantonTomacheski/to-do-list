@@ -10,6 +10,8 @@
     "saveProfile": "Save Profile",
     "firstNameRequired": "First name is required",
     "lastNameRequired": "Last name is required",
+    "enterFirstName": "Enter first name",
+    "enterLastName": "Enter last name",
     "uploadPhoto": "Upload Photo",
     "takePhoto": "Take Photo",
     "removePhoto": "Remove Photo",
