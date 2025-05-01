@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowRight } from "lucide-react";
-import Input from "../atoms/Input";
+import { FieldLabel, InputBase } from "../atoms/FormComponents";
 import { Button } from "../atoms/Button";
 import PhotoUpload from "../atoms/PhotoUpload";
 import { User } from "../store/userStore";
@@ -79,27 +79,37 @@ const UserRegistrationForm: React.FC<UserRegistrationFormProps> = ({
         <PhotoUpload value={formData.photo} onChange={handlePhotoChange} />
       </div>
 
-      <Input
-        id="firstName"
-        name="firstName"
-        label={t("firstName")}
-        value={formData.firstName}
-        onChange={handleChange}
-        error={errors.firstName}
-        required
-        disabled={isSubmitting}
-      />
+      <div className="mb-4">
+        <FieldLabel htmlFor="firstName" required>
+          {t("firstName")}
+        </FieldLabel>
+        <InputBase
+          id="firstName"
+          name="firstName"
+          value={formData.firstName}
+          onChange={handleChange}
+          error={errors.firstName}
+          required
+          disabled={isSubmitting}
+          placeholder={t("enterFirstName")}
+        />
+      </div>
 
-      <Input
-        id="lastName"
-        name="lastName"
-        label={t("lastName")}
-        value={formData.lastName}
-        onChange={handleChange}
-        error={errors.lastName}
-        required
-        disabled={isSubmitting}
-      />
+      <div className="mb-4">
+        <FieldLabel htmlFor="lastName" required>
+          {t("lastName")}
+        </FieldLabel>
+        <InputBase
+          id="lastName"
+          name="lastName"
+          value={formData.lastName}
+          onChange={handleChange}
+          error={errors.lastName}
+          required
+          disabled={isSubmitting}
+          placeholder={t("enterLastName")}
+        />
+      </div>
 
       <div className="mt-8">
         <Button

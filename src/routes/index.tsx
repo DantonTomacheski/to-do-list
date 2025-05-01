@@ -12,50 +12,50 @@ import { useUserStore } from '../store/userStore'
 const Routes: React.FC = () => {
   const isOnboarded = useUserStore(state => state.isOnboarded)
 
-  // Create the router with protected routes
-  const router = createBrowserRouter([
-    {
-      path: '/',
-      element: isOnboarded ? <Navigate to="/dashboard" /> : <Welcome />,
-    },
-    {
-      path: '/welcome',
-      element: isOnboarded ? <Navigate to="/dashboard" /> : <Welcome />,
-    },
-    {
-      path: '/dashboard',
-      element: isOnboarded ? <Dashboard /> : <Navigate to="/welcome" />,
-    },
-    {
-      path: '/calendar',
-      element: isOnboarded ? <Calendar /> : <Navigate to="/welcome" />,
-    },
-    {
-      path: '/project/new',
-      element: isOnboarded ? <ProjectForm /> : <Navigate to="/welcome" />,
-    },
-    {
-      path: '/project/:id/edit',
-      element: isOnboarded ? <ProjectForm /> : <Navigate to="/welcome" />,
-    },
-    {
-      path: '/project/:id',
-      element: isOnboarded ? <ProjectTasksPage /> : <Navigate to="/welcome" />,
-    },
-    {
-      path: '/project/:id/tasks',
-      element: isOnboarded ? <ProjectTasksPage /> : <Navigate to="/welcome" />,
-    },
-    {
-      path: '/tasks',
-      element: isOnboarded ? <TasksPage /> : <Navigate to="/welcome" />,
-    },
-    {
-      path: '/settings',
-      element: isOnboarded ? <SettingsPage /> : <Navigate to="/welcome" />,
-    },
-    // Other routes will be added here
-  ])
+  const router = createBrowserRouter(
+    [
+      {
+        path: '/',
+        element: isOnboarded ? <Navigate to="/dashboard" /> : <Welcome />,
+      },
+      {
+        path: '/welcome',
+        element: isOnboarded ? <Navigate to="/dashboard" /> : <Welcome />,
+      },
+      {
+        path: '/dashboard',
+        element: isOnboarded ? <Dashboard /> : <Navigate to="/welcome" />,
+      },
+      {
+        path: '/calendar',
+        element: isOnboarded ? <Calendar /> : <Navigate to="/welcome" />,
+      },
+      {
+        path: '/project/new',
+        element: isOnboarded ? <ProjectForm /> : <Navigate to="/welcome" />,
+      },
+      {
+        path: '/project/:id/edit',
+        element: isOnboarded ? <ProjectForm /> : <Navigate to="/welcome" />,
+      },
+      {
+        path: '/project/:id',
+        element: isOnboarded ? <ProjectTasksPage /> : <Navigate to="/welcome" />,
+      },
+      {
+        path: '/project/:id/tasks',
+        element: isOnboarded ? <ProjectTasksPage /> : <Navigate to="/welcome" />,
+      },
+      {
+        path: '/tasks',
+        element: isOnboarded ? <TasksPage /> : <Navigate to="/welcome" />,
+      },
+      {
+        path: '/settings',
+        element: isOnboarded ? <SettingsPage /> : <Navigate to="/welcome" />,
+      },
+    ]
+  )
 
   return <RouterProvider router={router} />
 }
