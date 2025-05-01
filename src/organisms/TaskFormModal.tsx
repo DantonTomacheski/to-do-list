@@ -51,11 +51,11 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
       // Manter a data original da tarefa durante a edição
       formattedDate = initialTask.date;
     } else {
-      // Usar o formato ISO localizado (YYYY-MM-DD) utilizando a data em UTC
-      // para garantir que não ocorra mudança de dia devido ao fuso horário
-      const year = selectedDate.getUTCFullYear();
-      const month = String(selectedDate.getUTCMonth() + 1).padStart(2, '0');
-      const day = String(selectedDate.getUTCDate()).padStart(2, '0');
+      // Usar o formato ISO localizado (YYYY-MM-DD) utilizando a data LOCAL
+      // para evitar problemas com fuso horário
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
       formattedDate = `${year}-${month}-${day}`;
     }
     

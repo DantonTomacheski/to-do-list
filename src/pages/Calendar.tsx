@@ -4,6 +4,14 @@ import { useSearchParams } from 'react-router-dom'
 import { format, addDays, subDays, startOfWeek, addWeeks, subWeeks, parse } from 'date-fns'
 import { ptBR, enUS } from 'date-fns/locale'
 
+// Função auxiliar para formatar datas no formato YYYY-MM-DD no fuso horário local
+function formatLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 import { useTaskStore, TaskStatus } from '../store/taskStore'
 import DayChip from '../atoms/DayChip'
 import StatusFilterChip from '../atoms/StatusFilterChip'
@@ -61,7 +69,8 @@ const Calendar: React.FC = () => {
       selectDate(dateParam)
     } else {
       // If no date in URL, set to today or current selected date
-      const today = new Date().toISOString().split('T')[0]
+      // Usar função auxiliar para formatar a data no formato YYYY-MM-DD no fuso horário local
+      const today = formatLocalDate(new Date())
       setSearchParams({ date: selectedDate || today })
     }
     
