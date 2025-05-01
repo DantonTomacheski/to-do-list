@@ -23,7 +23,7 @@ const DropdownPopover: React.FC<DropdownPopoverProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-xl shadow-lg z-20 overflow-hidden animate-scale-in origin-top">
+    <div className="absolute left-0 right-0 top-full mt-1 bg-white rounded-xl shadow-lg z-navigation overflow-hidden animate-scale-in origin-top">
       <div className="max-h-60 overflow-y-auto p-2">
         {groups.map((group) => (
           <button

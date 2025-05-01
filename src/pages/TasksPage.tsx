@@ -1,14 +1,16 @@
 import React, { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useTaskStore, TaskStatus } from '../store/taskStore'
-import HeaderBar from '../molecules/HeaderBar'
 import TaskCard from '../molecules/TaskCard'
-import BottomNavigation from '../molecules/BottomNavigation'
-import StatusFilterChip from '../atoms/StatusFilterChip'
 import TaskFormModal from '../organisms/TaskFormModal'
+import BottomNavigation from '../molecules/BottomNavigation'
+import useDateUtils from '../hooks/useDateUtils'
+import StatusFilterChip from '../atoms/StatusFilterChip'
+import HeaderBar from '../molecules/HeaderBar'
 
 const TasksPage: React.FC = () => {
   const { t } = useTranslation()
+  const { parseFromYYYYMMDD, getTodayFormatted } = useDateUtils()
   const [showTaskModal, setShowTaskModal] = useState(false)
   const [showSnackbar, setShowSnackbar] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
@@ -44,7 +46,7 @@ const TasksPage: React.FC = () => {
         if (statusCompare !== 0) return statusCompare
         
         // Then sort by date (newest first)
-        return new Date(b.date).getTime() - new Date(a.date).getTime()
+        return parseFromYYYYMMDD(b.date).getTime() - parseFromYYYYMMDD(a.date).getTime()
       })
   }, [tasks, searchQuery, activeFilter])
 
@@ -246,7 +248,7 @@ const TasksPage: React.FC = () => {
           }, 3000);
         }}
         projectId="" // Will need to be updated if project selection is added
-        selectedDate={new Date()}
+        selectedDate={parseFromYYYYMMDD(getTodayFormatted())}
       />
 
       {/* Bottom Navigation */}

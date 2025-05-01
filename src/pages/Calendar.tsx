@@ -1,16 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
-import { format, addDays, subDays, startOfWeek, addWeeks, subWeeks, parse } from 'date-fns'
-import { ptBR, enUS } from 'date-fns/locale'
-
-// Função auxiliar para formatar datas no formato YYYY-MM-DD no fuso horário local
-function formatLocalDate(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
+import useDateUtils from '../hooks/useDateUtils'
 
 import { useTaskStore, TaskStatus } from '../store/taskStore'
 import DayChip from '../atoms/DayChip'
@@ -19,11 +10,12 @@ import TaskCard from '../molecules/TaskCard'
 import BottomNavigation from '../molecules/BottomNavigation'
 import HeaderBar from '../molecules/HeaderBar'
 import TaskFormModal from '../organisms/TaskFormModal'
+import { addWeeks, subWeeks } from 'date-fns'
 
 const Calendar: React.FC = () => {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
-  const locale = i18n.language === 'pt-BR' ? ptBR : enUS
+  const { formatToYYYYMMDD, parseFromYYYYMMDD, addDaysFormatted, subtractDaysFormatted, formatForDisplay, getTodayFormatted, getWeekStart } = useDateUtils()
   
   // Task store hooks
   const {
@@ -56,9 +48,9 @@ const Calendar: React.FC = () => {
   const [currentWeek, setCurrentWeek] = useState(() => {
     // Get the week that contains the selected date
     const date = searchParams.get('date') 
-      ? parse(searchParams.get('date') as string, 'yyyy-MM-dd', new Date()) 
+      ? parseFromYYYYMMDD(searchParams.get('date') as string) 
       : new Date()
-    return startOfWeek(date, { locale })
+    return getWeekStart(date)
   })
   
   // Handle URL params
@@ -70,7 +62,7 @@ const Calendar: React.FC = () => {
     } else {
       // If no date in URL, set to today or current selected date
       // Usar função auxiliar para formatar a data no formato YYYY-MM-DD no fuso horário local
-      const today = formatLocalDate(new Date())
+      const today = getTodayFormatted()
       setSearchParams({ date: selectedDate || today })
     }
     
@@ -96,12 +88,18 @@ const Calendar: React.FC = () => {
 
   // Generate days based on screen size (7 for mobile, 14 for desktop)
   const weekDays = Array.from({ length: isMobile ? 7 : 14 }).map((_, index) => {
-    return addDays(currentWeek, index)
+    // Criar data usando a função de date-fns importada via hook
+    const dateObj = new Date(currentWeek);
+    dateObj.setDate(currentWeek.getDate() + index);
+    return dateObj;
   })
   
   // Handle day selection - wrapped in useCallback to avoid recreation on each render
-  const handleDaySelect = useCallback((date: Date) => {
-    const formattedDate = format(date, 'yyyy-MM-dd')
+  const handleDaySelect = useCallback((day: Date) => {
+    // Formatando a data selecionada usando o hook centralizado
+    const formattedDate = formatToYYYYMMDD(day)
+    
+    // Atualizar a data no store e URL search param
     selectDate(formattedDate)
     setSearchParams({ date: formattedDate })
   }, [selectDate, setSearchParams])
@@ -122,12 +120,12 @@ const Calendar: React.FC = () => {
   
   // Navigate to previous week
   const handlePrevWeek = () => {
-    setCurrentWeek(prev => subWeeks(prev, 1))
+    setCurrentWeek((prev: Date) => subWeeks(prev, 1))
   }
   
   // Navigate to next week
   const handleNextWeek = () => {
-    setCurrentWeek(prev => addWeeks(prev, 1))
+    setCurrentWeek((prev: Date) => addWeeks(prev, 1))
   }
   
   // Update task status
@@ -179,10 +177,14 @@ const Calendar: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
-        const prevDay = subDays(parse(selectedDate, 'yyyy-MM-dd', new Date()), 1)
+        // Usar o hook centralizado para manipular datas
+        const prevDateStr = subtractDaysFormatted(selectedDate, 1)
+        const prevDay = parseFromYYYYMMDD(prevDateStr)
         handleDaySelect(prevDay)
       } else if (e.key === 'ArrowRight') {
-        const nextDay = addDays(parse(selectedDate, 'yyyy-MM-dd', new Date()), 1)
+        // Usar o hook centralizado para manipular datas
+        const nextDateStr = addDaysFormatted(selectedDate, 1)
+        const nextDay = parseFromYYYYMMDD(nextDateStr)
         handleDaySelect(nextDay)
       }
     }
@@ -237,7 +239,7 @@ const Calendar: React.FC = () => {
             onClick={() => setShowDatePicker(true)}
             className="font-medium text-gray-800 hover:text-purple-600 transition-colors px-2 py-1 rounded"
           >
-            {format(currentWeek, 'MMMM yyyy', { locale })}
+            {formatForDisplay(currentWeek).split(' ').slice(1).join(' ')}
           </button>
           
           <button 
@@ -262,13 +264,13 @@ const Calendar: React.FC = () => {
         >
           {weekDays.map((date) => (
             <div 
-              key={format(date, 'yyyy-MM-dd')} 
+              key={formatToYYYYMMDD(date)} 
               className="scroll-snap-align-start flex-shrink-0"
               style={{ scrollSnapAlign: 'start' }}
             >
               <DayChip 
                 date={date}
-                isSelected={format(date, 'yyyy-MM-dd') === selectedDate}
+                isSelected={formatToYYYYMMDD(date) === selectedDate}
                 onClick={() => handleDaySelect(date)}
                 onLongPress={handleDayLongPress}
               />
@@ -278,7 +280,7 @@ const Calendar: React.FC = () => {
         
         {/* Hidden date picker for quick jumps */}
         {showDatePicker && (
-          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-30 animate-fade-in" onClick={() => setShowDatePicker(false)}>
+          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-overlay animate-fade-in" onClick={() => setShowDatePicker(false)}>
             <div className="bg-white p-4 rounded-xl w-80 animate-slide-up" onClick={e => e.stopPropagation()}>
               <h3 className="font-medium text-gray-800 mb-4">{t('selectDate')}</h3>
               <input 
@@ -426,7 +428,7 @@ const Calendar: React.FC = () => {
       
       {/* FAB for Add Task */}
       <button 
-        className="fixed right-4 bottom-20 bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
+        className="fixed right-4 bottom-20 bg-purple-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95 z-fab"
         onClick={() => setShowTaskModal(true)}
         aria-label={t('addTask')}
       >
@@ -437,7 +439,7 @@ const Calendar: React.FC = () => {
       
       {/* Status updated snackbar */}
       {showSnackbar && (
-        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in">
+        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in z-toast">
           {snackbarMessage}
         </div>
       )}
@@ -452,8 +454,17 @@ const Calendar: React.FC = () => {
         onSubmit={taskData => {
           // Pass the task data to the task store
           const { addTask } = useTaskStore.getState();
-          addTask(taskData);
+          const newTaskId = addTask(taskData);
           setShowTaskModal(false);
+          
+          // DEPURAÇÃO: Verificar se a task foi salva com a data correta
+          const { tasks, selectedDate: currentSelectedDate } = useTaskStore.getState();
+          const newTask = tasks.find(t => t.id === newTaskId);
+          console.log('Task adicionada:', newTask);
+          console.log('Data selecionada na UI:', currentSelectedDate);
+          console.log('Data da task:', newTask?.date);
+          console.log('Todas as tasks:', tasks);
+          console.log('Tasks filtradas:', useTaskStore.getState().getFilteredTasksForDate());
           
           // Show success message
           setSnackbarMessage(t('taskAdded'));
@@ -463,7 +474,7 @@ const Calendar: React.FC = () => {
           }, 3000);
         }}
         projectId="" // Will need to be updated if project selection is added
-        selectedDate={selectedDate ? new Date(selectedDate) : new Date()}
+        selectedDate={selectedDate ? parseFromYYYYMMDD(selectedDate) : new Date()}
       />
     </div>
   )

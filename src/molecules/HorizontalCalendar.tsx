@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
-import { addDays, format, isSameDay } from "date-fns";
+import { addDays } from "date-fns";
 import { DayChip } from "../atoms/ProjectTasksAtoms";
+import useDateUtils from "../hooks/useDateUtils";
 
 interface HorizontalCalendarProps {
   selectedDate: Date;
@@ -13,6 +14,7 @@ const HorizontalCalendar: React.FC<HorizontalCalendarProps> = ({
   onSelectDate,
   daysToShow = 14,
 }) => {
+  const { formatToYYYYMMDD, isSameDay } = useDateUtils();
   // Generate days (today and next daysToShow-1 days)
   const days = Array.from({ length: daysToShow }).map((_, i) =>
     addDays(new Date(), i)
@@ -44,7 +46,7 @@ const HorizontalCalendar: React.FC<HorizontalCalendarProps> = ({
       >
         {days.map((day) => (
           <div
-            key={format(day, "yyyy-MM-dd")}
+            key={formatToYYYYMMDD(day)}
             className="snap-center flex-shrink-0"
             data-selected={isSameDay(day, selectedDate)}
           >

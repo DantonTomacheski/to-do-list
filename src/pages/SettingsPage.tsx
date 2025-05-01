@@ -207,7 +207,7 @@ const SettingsPage: React.FC = () => {
 
       {/* Confirm Logout Modal */}
       {showConfirmLogout && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
           <div className="bg-white rounded-xl p-5 max-w-sm w-full">
             <h3 className="text-lg font-semibold mb-3">{t("confirmLogout")}</h3>
             <p className="text-gray-600 mb-4">{t("logoutConfirmMessage")}</p>
@@ -232,7 +232,7 @@ const SettingsPage: React.FC = () => {
 
       {/* Confirm Reset Modal */}
       {showConfirmReset && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-modal">
           <div className="bg-white rounded-xl p-5 max-w-sm w-full">
             <h3 className="text-lg font-semibold mb-3">{t("confirmReset")}</h3>
             <p className="text-gray-600 mb-4">{t("resetConfirmMessage")}</p>
@@ -257,7 +257,7 @@ const SettingsPage: React.FC = () => {
 
       {/* Snackbar */}
       {showSnackbar && (
-        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in z-50">
+        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg animate-fade-in z-toast">
           {snackbarMessage}
         </div>
       )}

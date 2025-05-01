@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import useDateUtils from '../hooks/useDateUtils';
 
 export const BackBtn: React.FC<{ to: string }> = ({ to }) => {
   return (
@@ -69,12 +70,12 @@ interface DayChipProps {
 }
 
 export const DayChip: React.FC<DayChipProps> = ({ date, isActive, onClick }) => {
+  const { isSameDay } = useDateUtils();
   // Format the day name and number
   const dayName = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date);
   const dayNumber = date.getDate();
-  const isToday = new Date().getDate() === dayNumber &&
-    new Date().getMonth() === date.getMonth() &&
-    new Date().getFullYear() === date.getFullYear();
+  // Verificar se é o dia atual usando o hook centralizado
+  const isToday = isSameDay(date, new Date());
 
   return (
     <button
@@ -193,7 +194,7 @@ export const FabAdd: React.FC<{ onClick: () => void }> = ({ onClick }) => {
   return (
     <button
       // Removed fixed horizontal positioning classes (right-4)
-      className="w-14 h-14 bg-purple-600 text-white rounded-full shadow-lg active:scale-90 transition transform fixed bottom-20 z-10 flex items-center justify-center"
+      className="w-14 h-14 bg-purple-600 text-white rounded-full shadow-lg active:scale-90 transition transform fixed bottom-20 z-fab flex items-center justify-center"
       style={fabStyle} // Apply dynamic style
       onClick={onClick}
       aria-label="Add new task"

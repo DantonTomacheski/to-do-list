@@ -55,7 +55,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onSelect, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-30 flex flex-col items-center justify-end animate-fade-in">
+    <div className="fixed inset-0 bg-black/50 z-overlay flex flex-col items-center justify-end animate-fade-in">
       <div className="bg-white w-full rounded-t-xl max-w-md animate-slide-up">
         <div className="p-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800">{t('selectLogo')}</h2>

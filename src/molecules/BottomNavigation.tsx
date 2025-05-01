@@ -11,7 +11,7 @@ const BottomNavigation: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white p-3 shadow-md z-20">
+    <div className="fixed bottom-0 left-0 right-0 bg-white p-3 shadow-md z-navigation">
       <div className="max-w-[900px] mx-auto flex justify-between items-center w-full">
         <Link
           to="/dashboard"

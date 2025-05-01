@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Task, TaskStatus } from '../store/taskStore'
 import { CheckCircle, Circle, Clock, Edit } from 'lucide-react'
 import TaskFormModal from '../organisms/TaskFormModal'
+import useDateUtils from '../hooks/useDateUtils'
+import ReactDOM from 'react-dom'
 
 interface TaskCardProps {
   task: Task
@@ -22,6 +24,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   projectColor = 'bg-purple-100 text-purple-800' 
 }) => {
   const { t } = useTranslation()
+  const { parseFromYYYYMMDD } = useDateUtils()
   
   // Touch handling for swipe gestures
   const [touchStart, setTouchStart] = useState<number | null>(null)
@@ -248,14 +251,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
         </div>
       </div>
       
-      {/* Action drawer */}
-      {showActionDrawer && (
+      {/* Action drawer - Using Portal to ensure it's above all other elements */}
+      {showActionDrawer && ReactDOM.createPortal(
         <>
           <div 
-            className="fixed inset-0 bg-black/30 z-10 animate-fade-in"
+            className="fixed inset-0 bg-black/30 z-overlay animate-fade-in"
             onClick={closeActionDrawer}
           />
-          <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-xl p-4 shadow-lg z-20 animate-slide-up">
+          <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-xl p-4 shadow-lg z-toast animate-slide-up">
             <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-800 mb-4">{task.title}</h3>
             
@@ -281,7 +284,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
               </button>
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
       
       {/* Modal de edição */}
@@ -291,7 +295,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
           onClose={() => setShowEditModal(false)}
           onSubmit={handleUpdateTask}
           projectId={task.projectId || ''}
-          selectedDate={new Date(task.date)}
+          selectedDate={parseFromYYYYMMDD(task.date)}
           initialTask={task}
           isEditing={true}
         />

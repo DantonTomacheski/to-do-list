@@ -62,7 +62,7 @@ const NewGroupDialog: React.FC<NewGroupDialogProps> = ({
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center animate-fade-in">
+    <div className="fixed inset-0 bg-black/60 z-modal flex items-center justify-center animate-fade-in">
       <div 
         className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 animate-scale-in"
         role="alertdialog"

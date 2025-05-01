@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useTaskStore, TaskStatus as StoreTaskStatus, Task } from '../store/taskStore';
 import ProjectTasksTemplate from '../templates/ProjectTasksTemplate';
 import { TaskStatus } from '../atoms/ProjectTasksAtoms';
+import useDateUtils from '../hooks/useDateUtils';
 
 // Criamos um tipo intermediário que é compatível com ambos os tipos de status
 type CombinedTaskStatus = StoreTaskStatus | 'All';
@@ -13,6 +14,8 @@ const ProjectTasksPage: React.FC = () => {
   const navigate = useNavigate();
   // useTranslation é usado pelos componentes filhos, não precisamos extrair o 't' aqui
   useTranslation();
+  // Usando o hook centralizado para manipulação de datas
+  const { formatToYYYYMMDD } = useDateUtils();
   
   // State
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -35,8 +38,8 @@ const ProjectTasksPage: React.FC = () => {
   // Handle project not found
   useEffect(() => {
     if (projectId && !project) {
-      // If project doesn't exist, redirect to projects list
-      navigate('/projects', { replace: true });
+      // If project doesn't exist, redirect to Dashboard
+      navigate('/dashboard', { replace: true });
     } else {
       // Set loading false after a brief delay to simulate loading
       const timer = setTimeout(() => setIsLoading(false), 800);
@@ -48,13 +51,9 @@ const ProjectTasksPage: React.FC = () => {
   const filteredTasks = useCallback(() => {
     if (!projectId) return [];
     
-    // Formatamos a data usando o mesmo método que usamos no TaskFormModal para manter consistência
+    // Formatamos a data usando o hook centralizado para manter consistência
     // Isso evita problemas de fuso horário que podem fazer com que a data seja deslocada em um dia
-    const selectedDateISO = [
-      selectedDate.getFullYear(),
-      String(selectedDate.getMonth() + 1).padStart(2, '0'),
-      String(selectedDate.getDate()).padStart(2, '0')
-    ].join('-');
+    const selectedDateISO = formatToYYYYMMDD(selectedDate);
 
     // Habilitamos logs em modo de desenvolvimento apenas quando necessário
     // const debug = (message: string, data: any) => console.log(message, data);
@@ -133,7 +132,7 @@ const ProjectTasksPage: React.FC = () => {
   };
   
   const handleBack = () => {
-    navigate(`/projects/${projectId}`);
+    navigate('/dashboard', { replace: true });
   };
   
   if (!project) {

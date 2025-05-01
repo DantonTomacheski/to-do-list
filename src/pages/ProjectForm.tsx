@@ -31,7 +31,7 @@ const ConfirmationDialog: React.FC<{
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center animate-fade-in">
+    <div className="fixed inset-0 bg-black/60 z-modal flex items-center justify-center animate-fade-in">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 animate-scale-in">
         <div className="p-4 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800">{title}</h2>

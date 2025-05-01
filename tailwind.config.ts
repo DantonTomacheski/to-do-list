@@ -14,6 +14,16 @@ const config: Config = {
           "100%": { width: "500px", height: "500px", opacity: "0" }, // Termina completamente transparente
         },
       },
+      zIndex: {
+        'base': '0',
+        'content': '10',
+        'navigation': '20', 
+        'fab': '30',
+        'overlay': '40',
+        'modal': '50',
+        'toast': '60',
+        'tooltip': '70'
+      },
     },
   },
   plugins: [forms],

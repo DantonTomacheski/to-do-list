@@ -1,8 +1,10 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-// Função auxiliar para formatar datas no formato YYYY-MM-DD no fuso horário local
-function formatLocalDate(date: Date): string {
+// Importação condicional para permitir que o store seja inicializado sem o hook
+// Isso evita problemas de SSR e circularidade de imports
+const formatDateToYYYYMMDD = (date: Date): string => {
+  // Implementação do método de formatação que será usado somente na inicialização
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
@@ -76,7 +78,7 @@ export const useTaskStore = create<TaskStore>()(
     (set, get) => ({
       tasks: [],
       projects: [],
-      selectedDate: formatLocalDate(new Date()), // Default to today
+      selectedDate: formatDateToYYYYMMDD(new Date()), // Default to today
       activeStatusFilter: 'All',
       isLoading: false,
 
@@ -287,7 +289,7 @@ export const useTaskStore = create<TaskStore>()(
       },
 
       getTodayProgress: () => {
-        const today = formatLocalDate(new Date())
+        const today = formatDateToYYYYMMDD(new Date())
         const todayTasks = get().tasks.filter(task => task.date === today)
         const completedTasks = todayTasks.filter(task => task.status === 'Done')
         
@@ -305,7 +307,7 @@ export const useTaskStore = create<TaskStore>()(
         set({
           tasks: [],
           projects: [],
-          selectedDate: formatLocalDate(new Date()),
+          selectedDate: formatDateToYYYYMMDD(new Date()),
           activeStatusFilter: 'All',
           isLoading: false
         })

@@ -98,23 +98,6 @@ const Dashboard: React.FC = () => {
       }
     });
 
-    // If no projects with tasks, create a default task group
-    if (
-      projectTaskMap.size === 0 ||
-      Array.from(projectTaskMap.values()).every((data) => data.taskCount === 0)
-    ) {
-      return [
-        {
-          id: "default",
-          title: t("personalProject"),
-          taskCount: 0,
-          progress: 0,
-          color: "bg-purple-100",
-          iconColor: "#8B5CF6",
-        },
-      ];
-    }
-
     // Return only projects that have tasks
     return Array.from(projectTaskMap.values())
       .filter((data) => data.taskCount > 0)

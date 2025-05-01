@@ -75,7 +75,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
   
   return (
     <div 
-      className="fixed inset-0 bg-black/50 z-40 flex items-end sm:items-center justify-center animate-fade-in"
+      className="fixed inset-0 bg-black/50 z-overlay flex items-end sm:items-center justify-center animate-fade-in"
       onClick={handleBackdropClick}
     >
       <div 

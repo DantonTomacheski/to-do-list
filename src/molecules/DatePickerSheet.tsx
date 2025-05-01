@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { format, addMonths, subMonths, addDays, startOfMonth, endOfMonth, isSameDay, isWithinInterval, isBefore, parseISO, isToday } from 'date-fns';
-import { ptBR, enUS } from 'date-fns/locale';
+import { addMonths, subMonths, addDays, startOfMonth, endOfMonth, isWithinInterval, isBefore, isToday } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import useDateUtils from '../hooks/useDateUtils';
 
 interface DatePickerSheetProps {
   onSelect: (date: string) => void;
@@ -20,13 +20,15 @@ const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
   maxDate,
   title = 'Select Date'
 }) => {
-  const { i18n, t } = useTranslation();
-  const locale = i18n.language === 'pt-BR' ? ptBR : enUS;
+  const { t } = useTranslation();
+  const { parseFromYYYYMMDD, formatToYYYYMMDD, isSameDay, formatForDisplay, locale } = useDateUtils();
+  // Pegar a string da localidade para uso com Intl API
+  const localeString = locale.code || 'en-US';
 
   // Parse dates
-  const parsedSelectedDate = selectedDate ? parseISO(selectedDate) : new Date();
-  const parsedMinDate = minDate ? parseISO(minDate) : null;
-  const parsedMaxDate = maxDate ? parseISO(maxDate) : null;
+  const parsedSelectedDate = selectedDate ? parseFromYYYYMMDD(selectedDate) : new Date();
+  const parsedMinDate = minDate ? parseFromYYYYMMDD(minDate) : null;
+  const parsedMaxDate = maxDate ? parseFromYYYYMMDD(maxDate) : null;
 
   // Current view state
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(parsedSelectedDate));
@@ -73,7 +75,7 @@ const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
       return;
     }
     
-    onSelect(format(day, 'yyyy-MM-dd'));
+    onSelect(formatToYYYYMMDD(day));
     
     // Use setTimeout to ensure the state change occurs before closing
     setTimeout(() => {
@@ -104,7 +106,7 @@ const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
       return;
     }
     
-    onSelect(format(today, 'yyyy-MM-dd'));
+    onSelect(formatToYYYYMMDD(today));
     // Use setTimeout to ensure state updates before closing
     setTimeout(() => {
       onClose();
@@ -113,7 +115,7 @@ const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
 
   // Day rendering with proper styling
   const renderDay = (day: Date) => {
-    const isSelectedDay = selectedDate ? isSameDay(day, parseISO(selectedDate)) : false;
+    const isSelectedDay = selectedDate ? isSameDay(day, parseFromYYYYMMDD(selectedDate)) : false;
     const isInCurrentMonth = day.getMonth() === currentMonth.getMonth();
     const isTodayDate = isToday(day);
     
@@ -152,7 +154,7 @@ const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
           disabled={true}
           className={classNames}
         >
-          {format(day, 'd')}
+          {day.getDate()}
         </button>
       );
     }
@@ -165,18 +167,20 @@ const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
         className={classNames}
         onClick={handleClick}
       >
-        {format(day, 'd')}
+        {day.getDate()}
       </button>
     );
   };
 
   const weekDays = Array.from({ length: 7 }).map((_, i) => {
     const day = i === 0 ? 6 : i - 1; // Adjust to locale's starting day
-    return format(new Date(2021, 1, day + 1), 'EEEEEE', { locale });
+    // Usando uma data fixa apenas para obter os nomes dos dias da semana
+    const weekdayDate = new Date(2021, 1, day + 1);
+    return new Intl.DateTimeFormat(localeString, { weekday: 'short' }).format(weekdayDate).slice(0, 2);
   });
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-30 flex flex-col items-center justify-end animate-fade-in">
+    <div className="fixed inset-0 bg-black/50 z-overlay flex flex-col items-center justify-end animate-fade-in">
       <div className="bg-white w-full rounded-t-xl max-w-md animate-slide-up">
         <div className="border-b border-gray-100">
           <div className="flex items-center justify-between p-4">
@@ -228,7 +232,7 @@ const DatePickerSheet: React.FC<DatePickerSheetProps> = ({
               </svg>
             </button>
             <span className="text-gray-800 font-medium">
-              {format(currentMonth, 'MMMM yyyy', { locale })}
+              {formatForDisplay(currentMonth).split(' ').slice(1).join(' ')}
             </span>
             <button
               type="button"

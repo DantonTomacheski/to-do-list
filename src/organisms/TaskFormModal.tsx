@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import ModalTemplate from "../templates/ModalTemplate";
 import { Task, TaskStatus } from "../store/taskStore";
+import useDateUtils from "../hooks/useDateUtils";
 
 interface TaskFormModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
   isEditing = false,
 }) => {
   const { t } = useTranslation();
+  const { formatToYYYYMMDD } = useDateUtils();
   const [title, setTitle] = useState(initialTask?.title || "");
   const [description, setDescription] = useState(initialTask?.description || "");
   const [priority, setPriority] = useState<"Low" | "Medium" | "High">(initialTask?.priority || "Medium");
@@ -51,12 +53,21 @@ const TaskFormModal: React.FC<TaskFormModalProps> = ({
       // Manter a data original da tarefa durante a edição
       formattedDate = initialTask.date;
     } else {
-      // Usar o formato ISO localizado (YYYY-MM-DD) utilizando a data LOCAL
-      // para evitar problemas com fuso horário
-      const year = selectedDate.getFullYear();
-      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-      const day = String(selectedDate.getDate()).padStart(2, '0');
-      formattedDate = `${year}-${month}-${day}`;
+      // CORREÇÃO: Garantir que a data seja exatamente a selecionada, sem ajustes de timezone
+      // Criar uma nova data no mesmo dia que selectedDate, mas no fuso horário local às 12:00
+      // Isso evita problemas de conversão que estavam causando um dia de diferença
+      const localDate = new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        selectedDate.getDate(),
+        12, 0, 0  // meio-dia para evitar problemas de fuso horário
+      );
+      formattedDate = formatToYYYYMMDD(localDate);
+      
+      // Debug
+      console.log('Data selecionada:', selectedDate);
+      console.log('Data localizada para 12:00:', localDate);
+      console.log('Data formatada final:', formattedDate);
     }
     
     // Create task data

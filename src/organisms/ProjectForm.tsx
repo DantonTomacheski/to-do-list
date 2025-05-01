@@ -15,6 +15,7 @@ import DropdownPopover, { TaskGroup } from '../molecules/DropdownPopover';
 import DatePickerSheet from '../molecules/DatePickerSheet';
 import ImagePicker from '../molecules/ImagePicker';
 import NewGroupDialog from '../molecules/NewGroupDialog';
+import useDateUtils from '../hooks/useDateUtils';
 
 // Project data interface
 export interface ProjectData {
@@ -46,6 +47,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
   onDelete
 }) => {
   const { t } = useTranslation();
+  const { getTodayFormatted } = useDateUtils();
   const isEditMode = !!initialData?.id;
   
   // Form state
@@ -57,7 +59,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       : null
   );
   const [logo, setLogo] = useState<string | null>(initialData?.logo || null);
-  const [startDate, setStartDate] = useState<string | null>(initialData?.startDate || format(new Date(), 'yyyy-MM-dd'));
+  const [startDate, setStartDate] = useState<string | null>(initialData?.startDate || getTodayFormatted());
   const [endDate, setEndDate] = useState<string | null>(initialData?.endDate || null);
   
   // UI state
@@ -383,7 +385,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         <DatePickerSheet
           title={t('selectStartDate')}
           selectedDate={startDate}
-          minDate={format(new Date(), 'yyyy-MM-dd')}
+          minDate={getTodayFormatted()}
           onSelect={(date) => {
             setStartDate(date);
             setFormErrors(prev => ({ ...prev, startDate: '' }));

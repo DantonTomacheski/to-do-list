@@ -1,6 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import ProgressCircle from "../atoms/ProgressCircle";
+import useDateUtils from "../hooks/useDateUtils";
+import { useNavigate } from "react-router-dom";
 
 interface ProgressCardProps {
   percentage: number;
@@ -8,23 +10,18 @@ interface ProgressCardProps {
   total?: number;
 }
 
-import { useNavigate } from "react-router-dom";
-
 const ProgressCard: React.FC<ProgressCardProps> = ({ percentage, completed, total }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { getTodayFormatted } = useDateUtils();
 
-  // Obter data de hoje no formato yyyy-MM-dd
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, '0');
-  const dd = String(today.getDate()).padStart(2, '0');
-  const todayStr = `${yyyy}-${mm}-${dd}`;
+  // Obter data de hoje formatada usando o hook centralizado
+  const todayFormatted = getTodayFormatted();
 
   return (
     <div className="bg-purple-600 p-4 rounded-xl text-white relative overflow-hidden">
       <div className="flex items-center justify-between">
-        <div className="z-10">
+        <div className="z-content">
           <p className="text-white/90 mb-1">{t("todaysTaskProgress")}</p>
           {completed !== undefined && total !== undefined && (
             <p className="text-white/80 text-sm">
@@ -33,12 +30,12 @@ const ProgressCard: React.FC<ProgressCardProps> = ({ percentage, completed, tota
           )}
           <button
             className="bg-white/20 backdrop-blur-sm text-white px-6 py-2 rounded-lg mt-4 hover:bg-white/30 transition-all duration-200"
-            onClick={() => navigate(`/calendar?date=${todayStr}`)}
+            onClick={() => navigate(`/calendar?date=${todayFormatted}`)}
           >
             {t("viewTask")}
           </button>
         </div>
-        <div className="z-10">
+        <div className="z-content">
           <ProgressCircle
             percentage={percentage}
             color="#FFFFFF"
