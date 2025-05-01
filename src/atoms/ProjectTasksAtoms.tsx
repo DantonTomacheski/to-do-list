@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export const BackBtn: React.FC<{ to: string }> = ({ to }) => {
@@ -53,8 +53,8 @@ export const NotifBell: React.FC = () => {
 
 export const PageTitle: React.FC<{ title: string }> = ({ title }) => {
   return (
-    <h1 
-      id="projectTitle" 
+    <h1
+      id="projectTitle"
       className="text-lg font-semibold truncate flex-1 px-3"
     >
       {title}
@@ -72,10 +72,10 @@ export const DayChip: React.FC<DayChipProps> = ({ date, isActive, onClick }) => 
   // Format the day name and number
   const dayName = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date);
   const dayNumber = date.getDate();
-  const isToday = new Date().getDate() === dayNumber && 
-                  new Date().getMonth() === date.getMonth() &&
-                  new Date().getFullYear() === date.getFullYear();
-  
+  const isToday = new Date().getDate() === dayNumber &&
+    new Date().getMonth() === date.getMonth() &&
+    new Date().getFullYear() === date.getFullYear();
+
   return (
     <button
       onClick={onClick}
@@ -108,8 +108,8 @@ export const StatusChip: React.FC<StatusChipProps> = ({ status, isActive, onClic
       onClick={onClick}
       className={`
         px-4 py-1 rounded-full text-sm font-medium transition-colors
-        ${isActive 
-          ? 'bg-purple-600 text-white' 
+        ${isActive
+          ? 'bg-purple-600 text-white'
           : 'bg-gray-100 text-gray-700 hover:bg-purple-100'}
       `}
     >
@@ -156,7 +156,7 @@ interface BadgeProps {
 
 export const Badge: React.FC<BadgeProps> = ({ status }) => {
   return (
-    <span 
+    <span
       className={`text-xs font-bold px-2 py-0.5 rounded-full ${getStatusColor(status)}`}
     >
       {status}
@@ -165,9 +165,36 @@ export const Badge: React.FC<BadgeProps> = ({ status }) => {
 };
 
 export const FabAdd: React.FC<{ onClick: () => void }> = ({ onClick }) => {
+  const [fabStyle, setFabStyle] = useState<React.CSSProperties>({});
+
+  useEffect(() => {
+    const updateFabPosition = () => {
+      const screenWidth = window.innerWidth;
+      const contentMaxWidth = 900; // Max width set in index.css
+      const fabOffset = 16; // Equivalent to Tailwind's 'right-4' (1rem)
+
+      if (screenWidth <= contentMaxWidth) {
+        // On smaller screens, stick to the edge
+        setFabStyle({ right: `${fabOffset}px` });
+      } else {
+        // On wider screens, calculate offset from content edge
+        const margin = (screenWidth - contentMaxWidth) / 2;
+        setFabStyle({ right: `${margin + fabOffset}px` });
+      }
+    };
+
+    updateFabPosition(); // Initial calculation
+    window.addEventListener("resize", updateFabPosition);
+
+    // Cleanup listener on component unmount
+    return () => window.removeEventListener("resize", updateFabPosition);
+  }, []);
+
   return (
     <button
-      className="w-14 h-14 bg-purple-600 text-white rounded-full shadow-lg active:scale-90 transition transform fixed bottom-20 right-4 z-10 flex items-center justify-center"
+      // Removed fixed horizontal positioning classes (right-4)
+      className="w-14 h-14 bg-purple-600 text-white rounded-full shadow-lg active:scale-90 transition transform fixed bottom-20 z-10 flex items-center justify-center"
+      style={fabStyle} // Apply dynamic style
       onClick={onClick}
       aria-label="Add new task"
     >

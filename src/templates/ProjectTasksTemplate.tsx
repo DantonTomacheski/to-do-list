@@ -4,7 +4,8 @@ import HorizontalCalendar from "../molecules/HorizontalCalendar";
 import StatusFilterBar from "../molecules/StatusFilterBar";
 import TaskList from "../organisms/TaskList";
 import EmptyState from "../organisms/EmptyState";
-import BottomNavStub from "../organisms/BottomNavStub";
+import BottomNavigation from "../molecules/BottomNavigation";
+import { FabAdd } from "../atoms/ProjectTasksAtoms";
 import TaskFormModal from "../organisms/TaskFormModal";
 import { TaskStatus, Task } from "../store/taskStore";
 import { useTranslation } from "react-i18next";
@@ -90,7 +91,8 @@ const ProjectTasksTemplate: React.FC<ProjectTasksTemplateProps> = ({
         />
       </main>
 
-      <BottomNavStub onAddClick={() => setShowTaskModal(true)} />
+      <BottomNavigation />
+      <FabAdd onClick={() => setShowTaskModal(true)} />
 
       {/* Task Form Modal */}
       <TaskFormModal

@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Upload, X } from "lucide-react";
-import { compressImageToBase64 } from "@/utils/imageCompression";
+import { compressImageToBase64 } from "@/services/imageCompression";
 import { useUserStore } from "@/store/userStore";
 import defaultAvatarImage from "../assets/avatar/2.png";
 

@@ -38,13 +38,15 @@ export const compressImage = async (
 };
 
 // Utility to compress profile photos - 150x150 pixels max
-export const compressProfilePhoto = (file: File): Promise<CompressedImageResult> => {
-  return compressImage(file, 200, 150);
+export const compressProfilePhoto = async (file: File): Promise<CompressedImageResult> => {
+  // Use 10MB limit for profile photo
+  return compressImage(file, 10240, 150);
 };
 
 // Utility to compress project logos - 100x100 pixels max
-export const compressProjectLogo = (file: File): Promise<CompressedImageResult> => {
-  return compressImage(file, 200, 100);
+export const compressProjectLogo = async (file: File): Promise<CompressedImageResult> => {
+  // Use 10MB limit for project logo
+  return compressImage(file, 10240, 100);
 };
 
 // Convert a base64 string to a File object
@@ -56,4 +58,21 @@ export const dataUrlToFile = async (
   const res = await fetch(dataUrl);
   const blob = await res.blob();
   return new File([blob], fileName, { type });
+};
+
+/**
+ * Compresses an image file and returns it as a base64 string.
+ * Reuses the core compressImage logic.
+ * @param file - The image file to compress
+ * @param maxSizeKB - Optional max size in KB (defaults to compressImage default)
+ * @param maxWidthOrHeight - Optional max width/height (defaults to compressImage default)
+ * @returns Promise with the compressed image as base64 data URL string
+ */
+export const compressImageToBase64 = async (
+  file: File,
+  maxSizeKB?: number,
+  maxWidthOrHeight?: number
+): Promise<string> => {
+  const { dataUrl } = await compressImage(file, maxSizeKB, maxWidthOrHeight);
+  return dataUrl;
 };
