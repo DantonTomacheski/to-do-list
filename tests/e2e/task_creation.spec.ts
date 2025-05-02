@@ -1,6 +1,6 @@
 import { test, expect } from './auth-fixture';
 
-test('Create a new task and verify it appears', async ({ page }) => {
+test('Cria uma nova tarefa e valida se ela foi adicionada no dashboard', async ({ page }) => {
   await page.getByRole('link', { name: 'Calendar' }).click();
   await page.getByRole('button', { name: 'Add a task' }).click();
   await page.getByRole('textbox', { name: 'Task Title' }).click();
